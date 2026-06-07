@@ -25,6 +25,9 @@ const SERVICE_TYPE_LABELS = {
   BOSHQA: 'Boshqa',
 }
 
+const NO_BOOKING_TYPES = ['DAM_OLISH_MASKANI', 'KOTEJ', 'TURISTIK_BAZA']
+const canBook = r => !NO_BOOKING_TYPES.includes(r?.resortType)
+
 export default function ResortDetailPage() {
   const { id } = useParams()
   const [resort, setResort] = useState(null)
@@ -442,11 +445,33 @@ export default function ResortDetailPage() {
 
               {resort.pricePerNightMin && (
                 <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: 13, color: 'var(--text-light)' }}>dan </span>
-                  <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--primary)' }}>
-                    {Number(resort.pricePerNightMin).toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: 14, color: 'var(--text-light)' }}> {resort.currency}/kecha</span>
+                  {NO_BOOKING_TYPES.includes(resort.resortType) ? (
+                    // So'rov turlari uchun narx range
+                    <>
+                      <span style={{ fontSize: 13, color: 'var(--text-light)' }}>dan </span>
+                      <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--primary)' }}>
+                        {Number(resort.pricePerNightMin).toLocaleString()}
+                      </span>
+                      {resort.pricePerNightMax && resort.pricePerNightMax !== resort.pricePerNightMin && (
+                        <span style={{ fontSize: 16, color: 'var(--text-light)' }}>
+                          {' — '}{Number(resort.pricePerNightMax).toLocaleString()}
+                        </span>
+                      )}
+                      <span style={{ fontSize: 14, color: 'var(--text-light)' }}> {resort.currency}/kecha</span>
+                      <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 4 }}>
+                        * Aniq narx so'rov yuborilgandan keyin belgilanadi
+                      </div>
+                    </>
+                  ) : (
+                    // Band qilish turlari uchun aniq narx
+                    <>
+                      <span style={{ fontSize: 13, color: 'var(--text-light)' }}>dan </span>
+                      <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--primary)' }}>
+                        {Number(resort.pricePerNightMin).toLocaleString()}
+                      </span>
+                      <span style={{ fontSize: 14, color: 'var(--text-light)' }}> {resort.currency}/kecha</span>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -465,7 +490,9 @@ export default function ResortDetailPage() {
                 </div>
               ) : (
                 <form onSubmit={handleBooking}>
-                  <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 20 }}>🗓 Band qilish</h3>
+                  <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 20 }}>
+                    {canBook(resort) ? '🗓 Band qilish' : '📞 So'rov yuborish'}
+                  </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
                     <input
@@ -483,39 +510,46 @@ export default function ResortDetailPage() {
                       style={inputStyle}
                     />
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                      <div>
-                        <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Kirish *</label>
-                        <input
-                          required type="date"
-                          min={today}
-                          value={booking.checkInDate}
-                          onChange={e => setBooking(p => ({ ...p, checkInDate: e.target.value }))}
-                          style={inputStyle}
-                        />
+                    {canBook(resort) ? (
+                      <>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                          <div>
+                            <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Kirish *</label>
+                            <input
+                              required type="date"
+                              min={today}
+                              value={booking.checkInDate}
+                              onChange={e => setBooking(p => ({ ...p, checkInDate: e.target.value }))}
+                              style={inputStyle}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Chiqish *</label>
+                            <input
+                              required type="date"
+                              min={booking.checkInDate || today}
+                              value={booking.checkOutDate}
+                              onChange={e => setBooking(p => ({ ...p, checkOutDate: e.target.value }))}
+                              style={inputStyle}
+                            />
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                          <div>
+                            <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Kattalar</label>
+                            <input type="number" min={1} value={booking.adultsCount} onChange={e => setBooking(p => ({ ...p, adultsCount: e.target.value }))} style={inputStyle} />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Bolalar</label>
+                            <input type="number" min={0} value={booking.childrenCount} onChange={e => setBooking(p => ({ ...p, childrenCount: e.target.value }))} style={inputStyle} />
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: '12px 16px', fontSize: 13, color: '#166534' }}>
+                        💡 Bu maskan uchun so'rov yuboring — admin siz bilan bog'lanib, narx va sana bo'yicha kelishadi.
                       </div>
-                      <div>
-                        <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Chiqish *</label>
-                        <input
-                          required type="date"
-                          min={booking.checkInDate || today}
-                          value={booking.checkOutDate}
-                          onChange={e => setBooking(p => ({ ...p, checkOutDate: e.target.value }))}
-                          style={inputStyle}
-                        />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                      <div>
-                        <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Kattalar</label>
-                        <input type="number" min={1} value={booking.adultsCount} onChange={e => setBooking(p => ({ ...p, adultsCount: e.target.value }))} style={inputStyle} />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: 12, color: 'var(--text-light)', display: 'block', marginBottom: 4 }}>Bolalar</label>
-                        <input type="number" min={0} value={booking.childrenCount} onChange={e => setBooking(p => ({ ...p, childrenCount: e.target.value }))} style={inputStyle} />
-                      </div>
-                    </div>
+                    )}
 
                     <textarea
                       value={booking.specialRequests}
@@ -537,7 +571,7 @@ export default function ResortDetailPage() {
                       border: 'none', cursor: 'pointer', opacity: bookingLoading ? 0.7 : 1,
                       boxShadow: '0 4px 12px rgba(26,107,60,0.3)'
                     }}>
-                      {bookingLoading ? 'Yuborilmoqda...' : '📅 Band qilish'}
+                      {bookingLoading ? 'Yuborilmoqda...' : canBook(resort) ? '📅 Band qilish' : '📞 So\'rov yuborish'}
                     </button>
                   </div>
                 </form>
