@@ -25,6 +25,14 @@ function PrivateRoute({ children, superadminOnly = false }) {
   return children
 }
 
+// Render uxlamasligi uchun har 14 daqiqada ping
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    fetch('https://resort-uz.onrender.com/api/resorts?page=0&size=1')
+      .catch(() => {})
+  }, 5 * 60 * 1000)
+}
+
 export default function App() {
   return (
     <AuthProvider>
