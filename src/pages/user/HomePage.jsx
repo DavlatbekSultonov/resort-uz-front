@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
+import { useLang } from '../../context/LangContext'
+import { t } from '../../i18n/i18n'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../../components/Navbar'
 import ResortCard from '../../components/ResortCard'
 import { getFeaturedResorts } from '../../api/services'
 
 const RESORT_TYPES = [
-  { value: 'DAM_OLISH_MASKANI', label: '🏕️ Dam olish' },
-  { value: 'KOTEJ', label: '🏡 Kotej' },
-  { value: 'SANATORIY', label: '🏥 Sanatoriy' },
-  { value: 'MEHMONXONA', label: '🏨 Mehmonxona' },
-  { value: 'TOGLIK_RESORT', label: "⛰️ Tog'lik" },
-  { value: 'SUV_YONI_RESORT', label: '🏖️ Suv yoni' },
-  { value: 'AGROTURIZM', label: '🌾 Agro' },
-  { value: 'TURISTIK_BAZA', label: '⛺ Turistik baza' },
+  { value: 'DAM_OLISH_MASKANI', key: 'DAM_OLISH_MASKANI', icon: '🏕️' },
+  { value: 'KOTEJ', key: 'KOTEJ', icon: '🏡' },
+  { value: 'SANATORIY', key: 'SANATORIY', icon: '🏥' },
+  { value: 'MEHMONXONA', key: 'MEHMONXONA', icon: '🏨' },
+  { value: 'TOGLIK_RESORT', key: 'TOGLIK_RESORT', icon: '⛰️' },
+  { value: 'SUV_YONI_RESORT', key: 'SUV_YONI_RESORT', icon: '🏖️' },
+  { value: 'AGROTURIZM', key: 'AGROTURIZM', icon: '🌾' },
+  { value: 'TURISTIK_BAZA', key: 'TURISTIK_BAZA', icon: '⛺' },
 ]
 
 const REGIONS = [
@@ -29,18 +31,6 @@ export default function HomePage() {
   const { lang } = useLang()
   const navigate = useNavigate()
   const [geoLoading, setGeoLoading] = useState(false)
-
-  const handleNearby = () => {
-    if (!navigator.geolocation) { alert("Brauzer joylashuvni qo'llab-quvvatlamaydi"); return }
-    setGeoLoading(true)
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        setGeoLoading(false)
-        navigate(`/maskanlar?userLat=${pos.coords.latitude}&userLon=${pos.coords.longitude}`)
-      },
-      () => { setGeoLoading(false); alert("Joylashuvga ruxsat berilmadi") }
-    )
-  }
   const [featured, setFeatured] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -50,6 +40,18 @@ export default function HomePage() {
       .then(res => setFeatured(res.data.data || []))
       .finally(() => setLoading(false))
   }, [])
+
+  const handleNearby = () => {
+    if (!navigator.geolocation) return
+    setGeoLoading(true)
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        setGeoLoading(false)
+        navigate(`/maskanlar?userLat=${pos.coords.latitude}&userLon=${pos.coords.longitude}`)
+      },
+      () => setGeoLoading(false)
+    )
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -66,13 +68,13 @@ export default function HomePage() {
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.06) 1px, transparent 0)', backgroundSize: '28px 28px' }} />
         <div className="container" style={{ position: 'relative', textAlign: 'center', padding: '70px 24px' }}>
           <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.12)', padding: '6px 18px', borderRadius: 20, marginBottom: 20 }}>
-            <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>🌿 O'zbekiston bo'ylab dam olish</span>
+            <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>🌿 {t(lang, 'home.badge')}</span>
           </div>
           <h1 style={{ color: '#fff', fontSize: 'clamp(28px, 5vw, 58px)', fontWeight: 700, marginBottom: 14, lineHeight: 1.2, fontFamily: 'Playfair Display, serif' }}>
-            Dam Olish Maskanlari
+            {t(lang, 'home.title')}
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 17, marginBottom: 36 }}>
-            O'zbekistonning eng go'zal joylarda dam oling
+            {t(lang, 'home.subtitle')}
           </p>
 
           <form onSubmit={handleSearch} style={{ background: '#fff', borderRadius: 14, padding: 6, display: 'flex', gap: 6, maxWidth: 560, margin: '0 auto', boxShadow: '0 16px 48px rgba(0,0,0,0.25)' }}>
@@ -83,7 +85,7 @@ export default function HomePage() {
               style={{ flex: 1, border: 'none', padding: '12px 16px', fontSize: 15, borderRadius: 10, background: '#f9fafb', outline: 'none', fontFamily: 'inherit' }}
             />
             <button type="submit" style={{ background: 'linear-gradient(135deg, #0d4a28, #1a6b3c)', color: '#fff', padding: '12px 24px', borderRadius: 10, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-              🔍 Qidirish
+              🔍 {t(lang, 'home.search_btn')}
             </button>
           </form>
 
@@ -94,12 +96,16 @@ export default function HomePage() {
               cursor: geoLoading ? 'wait' : 'pointer', fontFamily: 'inherit',
               display: 'flex', alignItems: 'center', gap: 8
             }}>
-              {geoLoading ? t(lang, 'home.locating') : t(lang, 'home.nearby_btn')}
+              📍 {geoLoading ? t(lang, 'home.locating') : t(lang, 'home.nearby_btn')}
             </button>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 48, marginTop: 28, flexWrap: 'wrap' }}>
-            {[{ n: '100+', l: t(lang, 'home.stats_resorts') }, { n: '14', l: t(lang, 'home.stats_regions') }, { n: '1000+', l: t(lang, 'home.stats_guests') }].map(s => (
+            {[
+              { n: '100+', l: t(lang, 'home.stats_resorts') },
+              { n: '14', l: t(lang, 'home.stats_regions') },
+              { n: '1000+', l: t(lang, 'home.stats_guests') }
+            ].map(s => (
               <div key={s.l} style={{ textAlign: 'center' }}>
                 <div style={{ color: '#fff', fontSize: 30, fontWeight: 700 }}>{s.n}</div>
                 <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 14 }}>{s.l}</div>
@@ -112,13 +118,15 @@ export default function HomePage() {
       {/* MASKAN TURLARI */}
       <section style={{ padding: '52px 0 36px', background: '#fff' }}>
         <div className="container" style={{ padding: '0 24px' }}>
-          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 28, fontFamily: 'Playfair Display, serif' }}>Maskan turlari</h2>
+          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 28, fontFamily: 'Playfair Display, serif' }}>
+            {t(lang, 'home.types_title')}
+          </h2>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {RESORT_TYPES.map(t => (
-              <button key={t.value} onClick={() => navigate(`/maskanlar?resortType=${t.value}`)} style={{ padding: '10px 20px', borderRadius: 50, border: '1.5px solid #e5e7eb', background: '#fff', fontWeight: 500, fontSize: 14, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit' }}
+            {RESORT_TYPES.map(type => (
+              <button key={type.value} onClick={() => navigate(`/maskanlar?resortType=${type.value}`)} style={{ padding: '10px 20px', borderRadius: 50, border: '1.5px solid #e5e7eb', background: '#fff', fontWeight: 500, fontSize: 14, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#1a6b3c'; e.currentTarget.style.color = '#1a6b3c'; e.currentTarget.style.background = '#e8f5ee' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.background = '#fff' }}
-              >{t.label}</button>
+              >{type.icon} {t(lang, `types.${type.key}`)}</button>
             ))}
           </div>
         </div>
@@ -127,7 +135,9 @@ export default function HomePage() {
       {/* VILOYATLAR */}
       <section style={{ padding: '36px 0', background: '#f9fafb' }}>
         <div className="container" style={{ padding: '0 24px' }}>
-          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 28, fontFamily: 'Playfair Display, serif' }}>Viloyatlar bo'yicha</h2>
+          <h2 style={{ textAlign: 'center', fontSize: 28, fontWeight: 700, marginBottom: 28, fontFamily: 'Playfair Display, serif' }}>
+            {t(lang, 'home.regions_title')}
+          </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
             {REGIONS.map(r => (
               <button key={r.id} onClick={() => navigate(`/maskanlar?regionId=${r.id}`)} style={{ padding: '14px 10px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', textAlign: 'center', cursor: 'pointer', fontWeight: 500, fontSize: 13, fontFamily: 'inherit', transition: 'all 0.15s' }}
@@ -143,9 +153,12 @@ export default function HomePage() {
       <section style={{ padding: '52px 0' }}>
         <div className="container" style={{ padding: '0 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
-            <h2 style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Playfair Display, serif' }}>⭐ Tavsiya etilgan maskanlar</h2>
+            <div>
+              <h2 style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Playfair Display, serif' }}>⭐ {t(lang, 'home.featured_title')}</h2>
+              <p style={{ color: '#9ca3af', fontSize: 14, marginTop: 4 }}>{t(lang, 'home.featured_subtitle')}</p>
+            </div>
             <button onClick={() => navigate('/maskanlar')} style={{ padding: '10px 22px', borderRadius: 10, border: '1.5px solid #1a6b3c', color: '#1a6b3c', fontWeight: 600, background: '#fff', cursor: 'pointer', fontSize: 14, fontFamily: 'inherit' }}>
-              Barchasini ko'rish →
+              {t(lang, 'home.view_all')}
             </button>
           </div>
           {loading ? (
@@ -163,7 +176,7 @@ export default function HomePage() {
           ) : featured.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>🏕️</div>
-              <p>Hozircha tavsiya etilgan maskanlar yo'q</p>
+              <p>{t(lang, 'home.no_featured')}</p>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
@@ -177,9 +190,9 @@ export default function HomePage() {
       <footer style={{ background: '#0d4a28', color: 'rgba(255,255,255,0.7)', padding: '36px 0 20px' }}>
         <div className="container" style={{ textAlign: 'center', padding: '0 24px' }}>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', fontFamily: 'Playfair Display, serif', marginBottom: 10 }}>{t(lang, 'home.title')}</div>
-          <p style={{ fontSize: 14, marginBottom: 20 }}>O'zbekistondagi eng yaxshi dam olish joylari</p>
+          <p style={{ fontSize: 14, marginBottom: 20 }}>{t(lang, 'home.subtitle')}</p>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 16, fontSize: 13 }}>
-            © 2026 Dam Olish Maskanlari. Barcha huquqlar himoyalangan.
+            © 2026 Dam Olish Maskanlari
           </div>
         </div>
       </footer>
