@@ -491,7 +491,7 @@ export default function ResortDetailPage() {
               ) : (
                 <form onSubmit={handleBooking}>
                   <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 20 }}>
-                    {canBook(resort) ? '🗓 Band qilish' : '📞 So'rov yuborish'}
+                    {canBook(resort) ? "🗓 Band qilish" : "📞 So'rov yuborish"}
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 

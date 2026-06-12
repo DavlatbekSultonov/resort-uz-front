@@ -79,7 +79,7 @@ export default function HomePage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder=t(lang, 'home.search_placeholder')
+              placeholder={t(lang, 'home.search_placeholder')}
               style={{ flex: 1, border: 'none', padding: '12px 16px', fontSize: 15, borderRadius: 10, background: '#f9fafb', outline: 'none', fontFamily: 'inherit' }}
             />
             <button type="submit" style={{ background: 'linear-gradient(135deg, #0d4a28, #1a6b3c)', color: '#fff', padding: '12px 24px', borderRadius: 10, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
