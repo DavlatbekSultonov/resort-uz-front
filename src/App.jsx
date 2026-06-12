@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { LangProvider } from './context/LangContext'
 
 import HomePage from './pages/user/HomePage'
 import CatalogPage from './pages/user/CatalogPage'
@@ -35,6 +36,7 @@ if (typeof window !== 'undefined') {
 
 export default function App() {
   return (
+    <LangProvider>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -55,5 +57,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </LangProvider>
   )
 }

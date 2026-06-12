@@ -26,6 +26,7 @@ const REGIONS = [
 ]
 
 export default function HomePage() {
+  const { lang } = useLang()
   const navigate = useNavigate()
   const [geoLoading, setGeoLoading] = useState(false)
 
@@ -78,7 +79,7 @@ export default function HomePage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Maskan nomi yoki manzil..."
+              placeholder=t(lang, 'home.search_placeholder')
               style={{ flex: 1, border: 'none', padding: '12px 16px', fontSize: 15, borderRadius: 10, background: '#f9fafb', outline: 'none', fontFamily: 'inherit' }}
             />
             <button type="submit" style={{ background: 'linear-gradient(135deg, #0d4a28, #1a6b3c)', color: '#fff', padding: '12px 24px', borderRadius: 10, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
@@ -93,12 +94,12 @@ export default function HomePage() {
               cursor: geoLoading ? 'wait' : 'pointer', fontFamily: 'inherit',
               display: 'flex', alignItems: 'center', gap: 8
             }}>
-              {geoLoading ? "⏳ Joylashuv aniqlanmoqda..." : "📍 Menga yaqin maskanlarni ko'rsating"}
+              {geoLoading ? t(lang, 'home.locating') : t(lang, 'home.nearby_btn')}
             </button>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: 48, marginTop: 28, flexWrap: 'wrap' }}>
-            {[{ n: '100+', l: 'Maskan' }, { n: '14', l: 'Viloyat' }, { n: '1000+', l: 'Mehmon' }].map(s => (
+            {[{ n: '100+', l: t(lang, 'home.stats_resorts') }, { n: '14', l: t(lang, 'home.stats_regions') }, { n: '1000+', l: t(lang, 'home.stats_guests') }].map(s => (
               <div key={s.l} style={{ textAlign: 'center' }}>
                 <div style={{ color: '#fff', fontSize: 30, fontWeight: 700 }}>{s.n}</div>
                 <div style={{ color: 'rgba(255,255,255,0.65)', fontSize: 14 }}>{s.l}</div>
@@ -175,7 +176,7 @@ export default function HomePage() {
       {/* FOOTER */}
       <footer style={{ background: '#0d4a28', color: 'rgba(255,255,255,0.7)', padding: '36px 0 20px' }}>
         <div className="container" style={{ textAlign: 'center', padding: '0 24px' }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', fontFamily: 'Playfair Display, serif', marginBottom: 10 }}>Dam Olish Maskanlari</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', fontFamily: 'Playfair Display, serif', marginBottom: 10 }}>{t(lang, 'home.title')}</div>
           <p style={{ fontSize: 14, marginBottom: 20 }}>O'zbekistondagi eng yaxshi dam olish joylari</p>
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: 16, fontSize: 13 }}>
             © 2026 Dam Olish Maskanlari. Barcha huquqlar himoyalangan.

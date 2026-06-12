@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useLang } from '../../context/LangContext'
+import { t } from '../../i18n/i18n'
 import Navbar from '../../components/Navbar'
 import ResortCard from '../../components/ResortCard'
 import { userApi } from '../../api/api'
@@ -34,6 +36,7 @@ export default function CatalogPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
   const [page, setPage] = useState(0)
+  const { lang } = useLang()
   const [userCoords, setUserCoords] = useState(() => {
     const lat = searchParams.get('userLat')
     const lon = searchParams.get('userLon')
@@ -130,7 +133,7 @@ export default function CatalogPage() {
             <div>
               <h1 style={{ color: '#fff', fontSize: 30, fontWeight: 800, marginBottom: 6 }}>🏕️ Maskanlar</h1>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14 }}>
-                {loading ? 'Yuklanmoqda...' : `${totalElements} ta maskan topildi`}
+                {loading ? t(lang, 'catalog.loading') : `${totalElements} ${t(lang, 'catalog.found')}`}
                 {userCoords && <span style={{ marginLeft: 10, background: 'rgba(255,255,255,0.2)', padding: '2px 10px', borderRadius: 12, fontSize: 12 }}>📍 Sizga yaqinligi bo'yicha tartib</span>}
               </p>
             </div>
@@ -147,7 +150,7 @@ export default function CatalogPage() {
                 boxShadow: userCoords ? '0 2px 8px rgba(0,0,0,0.15)' : 'none'
               }}
             >
-              {geoLoading ? '⏳ Aniqlanmoqda...' : userCoords ? "✅ Yaqinlar ko'rsatilmoqda" : '📍 Menga yaqin maskanlar'}
+              {geoLoading ? '⏳ Aniqlanmoqda...' : userCoords ? t(lang, 'catalog.nearby_showing') : '📍 Menga yaqin maskanlar'}
             </button>
           </div>
           {geoError && (
